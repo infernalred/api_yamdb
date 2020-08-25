@@ -10,13 +10,13 @@ from rest_framework import generics
 class GenreSerializer(serializers.ModelSerializer):
     
     class Meta:
-        fields = ('name', 'slug')
+        fields = ['name', 'slug']
         model = Genre
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
-        fields = ('name', 'slug')
+        fields = ['name', 'slug']
         model = Category
        
 
@@ -25,6 +25,6 @@ class TitleSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
 
     class Meta:
-        fields = '__all__'
+        fields = ['name', 'year', 'genre', 'category', 'description']
         model = Title            
 
