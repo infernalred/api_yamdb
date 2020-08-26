@@ -22,7 +22,6 @@ from rest_framework.authtoken import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    #path('api/v1/', include(router_v1.urls)),
-    path('api/v1/', include('api_part_2.urls')),
+    path('api/', include('api.urls')),
     path('redoc/', TemplateView.as_view(template_name='redoc.html'), name='redoc'),
 ]
