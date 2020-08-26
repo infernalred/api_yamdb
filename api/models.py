@@ -4,6 +4,10 @@ from django.db import models
 User = get_user_model()
 
 
+class Rating(models.Model):
+    pass
+
+
 class Review(models.Model):
     title = models.ForeignKey(Title, on_delete=models.CASCADE,
                               related_name="reviews")
@@ -16,10 +20,12 @@ class Review(models.Model):
 
 
 class Comment(models.Model):
+    title = models.ForeignKey(Title, on_delete=models.CASCADE,
+                              related_name="comments")
     review = models.ForeignKey(Review, on_delete=models.CASCADE,
                                related_name="comments")
     text = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE,
                                related_name="comments")
-    pub_date = models.DateTimeField("Дата публикации1",
+    pub_date = models.DateTimeField("Дата публикации",
                                     auto_now_add=True)
