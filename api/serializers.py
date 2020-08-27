@@ -5,13 +5,13 @@ from .models import Comment, Review, Title, Category, Genre
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = ('name', 'slug')
+        fields = ("name", "slug")
         model = Genre
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
-        fields = ('name', 'slug')
+        fields = ("name", "slug")
         model = Category
 
 
@@ -20,7 +20,8 @@ class TitleSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
 
     class Meta:
-        fields = ('name', 'year', 'genre', 'category', 'description')
+        fields = ("id", "name", "year", "genre", "category", "description")
+        read_only_fields = ("id", )
         model = Title
 
 
@@ -35,10 +36,6 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    title = serializers.SlugRelatedField(slug_field="title",
-                                         read_only=True)
-    review = serializers.SlugRelatedField(slug_field="review",
-                                          read_only=True)
     author = serializers.SlugRelatedField(slug_field="username",
                                           read_only=True)
 
