@@ -37,22 +37,22 @@ class Title(models.Model):
 
 class Review(models.Model):
     title = models.ForeignKey(Title, on_delete=models.CASCADE,
-                              related_name="reviews")
+                              related_name="reviews", null=False)
     text = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE,
-                               related_name="reviews")
-    score = models.PositiveIntegerField()
+                               related_name="reviews", null=False)
+    score = models.PositiveIntegerField("Оценка", null=False)
     pub_date = models.DateTimeField("Дата публикации",
                                     auto_now_add=True)
 
 
 class Comment(models.Model):
     title = models.ForeignKey(Title, on_delete=models.CASCADE,
-                              related_name="comments")
+                              related_name="comments", null=False)
     review = models.ForeignKey(Review, on_delete=models.CASCADE,
-                               related_name="comments")
-    text = models.TextField()
+                               related_name="comments", null=False)
+    text = models.TextField(null=False)
     author = models.ForeignKey(User, on_delete=models.CASCADE,
-                               related_name="comments")
+                               related_name="comments", null=False)
     pub_date = models.DateTimeField("Дата публикации",
                                     auto_now_add=True)
