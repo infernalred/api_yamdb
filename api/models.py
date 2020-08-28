@@ -28,3 +28,30 @@ class Title(models.Model):
     # rating = models.IntegerField('Рейтинг', )
     category = models.ForeignKey('Category', on_delete=models.CASCADE,
                                  related_name="categories")
+
+
+# class Rating(models.Model):
+#     pass
+
+
+class Review(models.Model):
+    title = models.ForeignKey(Title, on_delete=models.CASCADE,
+                              related_name="reviews", null=False)
+    text = models.TextField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE,
+                               related_name="reviews", null=False)
+    score = models.PositiveIntegerField("Оценка", null=False)
+    pub_date = models.DateTimeField("Дата публикации",
+                                    auto_now_add=True)
+
+
+class Comment(models.Model):
+    title = models.ForeignKey(Title, on_delete=models.CASCADE,
+                              related_name="comments", null=False)
+    review = models.ForeignKey(Review, on_delete=models.CASCADE,
+                               related_name="comments", null=False)
+    text = models.TextField(null=False)
+    author = models.ForeignKey(User, on_delete=models.CASCADE,
+                               related_name="comments", null=False)
+    pub_date = models.DateTimeField("Дата публикации",
+                                    auto_now_add=True)
