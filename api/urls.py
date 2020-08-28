@@ -12,9 +12,8 @@ router_v1.register(r'titles/(?P<title_id>\d+)/reviews', ReviewViewSet, basename=
 router_v1.register(r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
                    CommentViewSet, basename='Comment')
 
-
 urlpatterns = [
     path('v1/', include(router_v1.urls)),
     path('v1/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('v1/token/refresh/', TokenRefreshView.as_view(), name='token_refresh')
+    path('v1/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

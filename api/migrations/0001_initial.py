@@ -37,8 +37,9 @@ class Migration(migrations.Migration):
                 ('name', models.TextField(verbose_name='Название')),
                 ('year', models.IntegerField(verbose_name='Год выпуска')),
                 ('description', models.TextField()),
-                ('category', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='categories', to='api.Category')),
-                ('genre', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='genres', to='api.Genre')),
+                ('category', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='categories',
+                                               to='api.Category')),
+                ('genre', models.ManyToManyField(related_name='genres', to='api.Genre')),
             ],
         ),
         migrations.CreateModel(
@@ -49,7 +50,7 @@ class Migration(migrations.Migration):
                 ('score', models.PositiveIntegerField()),
                 ('pub_date', models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')),
                 ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reviews', to=settings.AUTH_USER_MODEL)),
-                ('title', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reviews', to='api.Title')),
+                ('title', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reviews', to='api.Title')), 
             ],
         ),
         migrations.CreateModel(
