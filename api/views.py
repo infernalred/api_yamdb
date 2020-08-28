@@ -21,23 +21,37 @@ class TitleView(viewsets.ModelViewSet):
         serializer.save()
 
 
-class GenreView(ViewSetMixin, generics.ListCreateAPIView):
+class GenreView(viewsets.ModelViewSet):
     permission_classes = (AdminOrReadOnly, IsAdminUser)
     queryset = Genre.objects.all()
+    lookup_field = 'slug'
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
+    def retrieve(self, request, *args, **kwargs):
+       return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-class CategoryView(ViewSetMixin, generics.ListCreateAPIView):
+    def partial_update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)  
+
+
+class CategoryView(viewsets.ModelViewSet):
     permission_classes = (AdminOrReadOnly, IsAdminUser)
     queryset = Category.objects.all()
+    lookup_field = 'slug'
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
+    def retrieve(self, request, *args, **kwargs):
+       return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-class ReviewViewSet(viewsets.ModelViewSet):
+    def partial_update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+сlass ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = (AdminOrReadOnly, IsAdminUser)
 
@@ -74,3 +88,4 @@ class CommentViewSet(viewsets.ModelViewSet):
         review = get_object_or_404(Review.objects, pk=review_id)
         serializer.save(author=self.request.user, title=title,
                         review=review)
+      
