@@ -16,35 +16,14 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    genre = GenreSerializer()
-    category = CategorySerializer()
+    genre = GenreSerializer(read_only=True, many=True)
+    category = CategorySerializer(read_only=True)
 
     class Meta:
         fields = ("id", "name", "year", "genre", "category", "description")
         read_only_fields = ("id", )
         model = Title
 
-
-class GenreSerializer(serializers.ModelSerializer):
-    class Meta:
-        fields = ("name", "slug")
-        model = Genre
-
-
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        fields = ("name", "slug")
-        model = Category
-
-
-class TitleSerializer(serializers.ModelSerializer):
-    genre = GenreSerializer(many=True, read_only=True)
-    category = CategorySerializer()
-
-    class Meta:
-        fields = ("id", "name", "year", "genre", "category", "description")
-        read_only_fields = ("id", )
-        model = Title
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(slug_field="username",

@@ -27,7 +27,7 @@ class CategoryAdmin(admin.ModelAdmin):
     empty_value_display = "-пусто-"
 
     
- @admin.register(Review)
+@admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ("pk", "title", "text", "author", "score", "pub_date")
     search_fields = ("text",)
