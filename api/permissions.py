@@ -1,27 +1,29 @@
 from rest_framework import permissions
 
-
-class IsOwnerOrReadOnly(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        return request.method in permissions.SAFE_METHODS or \
-               obj.author == request.user
+MODERATOR_METHODS = ('PATCH', 'DELETE')
 
 
-class AdminOrReadOnly(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        return obj == request.user or request.user.is_staff
-
-
-class IsAdminUser(permissions.BasePermission):
-
-    def has_permission(self, request, view):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        return request.user and request.user.is_staff
+'''class IsAuthorOrReadOnly(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
-        return request.user and request.user.is_staff
+        return obj.author == request.user'''
+
+
+# for GENRES, TITLES and CATEGORIES set permission_classes = [IsAdminOrReadOnly]
+class IsAdminOrReadOnly(permissions.BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return request.user.is_staff or request.user.role == 'admin'
+
+
+# for COMMENTS and REVIEWS set permissions_classes = [IsAdminOrReadOnly|IsAuthorOrModerator]
+class IsAuthorOrModerator(permissions.BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in MODERATOR_METHODS and request.user.role == 'moderator':
+            return True
+        return obj.author == request.user

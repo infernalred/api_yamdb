@@ -40,6 +40,7 @@ class TitleView(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('name', 'year', 'genre', 'category',)
+
     def perform_create(self, serializer):
         category_slug = self.request.data.get('category')
         category = get_object_or_404(Category, slug=category_slug)
@@ -51,6 +52,7 @@ class TitleView(viewsets.ModelViewSet):
         if serializer.is_valid:
             serializer.save(category=category, genre=genres)
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
     def perform_update(self, serializer):
         category_slug = self.request.data.get('category')
         category = get_object_or_404(Category, slug=category_slug)
