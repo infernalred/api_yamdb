@@ -1,7 +1,23 @@
 from django.db.models import Avg
 from rest_framework import serializers
 
-from .models import Comment, Review, Title, Category, Genre
+from .models import Comment, Review, Title, \
+    Category, Genre, CustomUser
+
+
+class UserForAdminSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ("first_name", "last_name", "username", 
+                  "bio", "email", "role")
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ("first_name", "last_name", "username", 
+                  "bio", "email", "role")
+        read_only_fields = ("role", "email")
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -22,7 +38,8 @@ class TitleSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()
 
     class Meta:
-        fields = ("id", "name", "year", "genre", "rating", "category", "description")
+        fields = ("id", "name", "year", "genre", "rating", 
+                  "category", "description")
         read_only_fields = ("id", )
         model = Title
 

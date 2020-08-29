@@ -1,11 +1,13 @@
 from django.contrib import admin
 
-from .models import Review, Comment, Title, Category, Genre
+from .models import Review, Comment, Title, Category, Genre, CustomUser
+
+admin.site.register(CustomUser)
 
 
 @admin.register(Title)
 class TitleAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "year",  "category")
+    list_display = ("id", "name", "year", "category")
     search_fields = ("name",)
     list_filter = ("name",)
     empty_value_display = "-пусто-"
@@ -26,7 +28,7 @@ class CategoryAdmin(admin.ModelAdmin):
     list_filter = ("name",)
     empty_value_display = "-пусто-"
 
-    
+
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ("pk", "title", "text", "author", "score", "pub_date")

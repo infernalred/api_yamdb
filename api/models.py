@@ -1,7 +1,18 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 User = get_user_model()
+
+
+class CustomUser(AbstractUser):
+    email = models.EmailField(unique=True)
+    username = models.CharField(max_length=50, blank=True, null=True, unique=True)
+    bio = models.TextField(blank=True, null=True)
+    role = models.CharField(max_length=25, default='user')
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ('username',)
 
 
 class Genre(models.Model):

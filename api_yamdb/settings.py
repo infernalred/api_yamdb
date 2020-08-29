@@ -36,6 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'drfpasswordless',
+    'corsheaders',
     'django_filters',
     'api',
 ]
@@ -119,6 +121,8 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
 
+AUTH_USER_MODEL = 'api.CustomUser'
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -131,6 +135,17 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20
 
 }
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_URLS_REGEX = r'^/api/.*$'
+
+'''PASSWORDLESS_AUTH = {
+    'PASSWORDLESS_AUTH_TYPES': ['EMAIL'],
+    'PASSWORDLESS_EMAIL_NOREPLY_ADDRESS': 'noreply@example.com',
+    'PASSWORDLESS_AUTH_TOKEN_CREATOR': 'api.custom_jwt_token_creation.get_tokens_for_user',
+}'''
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
