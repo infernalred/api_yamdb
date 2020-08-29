@@ -1,7 +1,7 @@
-from rest_framework import viewsets, generics, filters
+from rest_framework import viewsets, filters, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from rest_framework.viewsets import ViewSetMixin
+from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
 from api.models import Review, Title, Genre, Category, Comment
@@ -18,7 +18,9 @@ class TitleView(viewsets.ModelViewSet):
     filterset_fields = ('name', 'year', 'genre', 'category',)
 
     def perform_create(self, serializer):
-        serializer.save()
+        slug_name = self.request.data.get("category")
+        category = get_object_or_404(Category.objects, slug=slug_name)
+        serializer.save(category=category)
 
 
 class GenreView(viewsets.ModelViewSet):
@@ -51,7 +53,7 @@ class CategoryView(viewsets.ModelViewSet):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-сlass ReviewViewSet(viewsets.ModelViewSet):
+class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = (AdminOrReadOnly, IsAdminUser)
 
@@ -88,4 +90,3 @@ class CommentViewSet(viewsets.ModelViewSet):
         review = get_object_or_404(Review.objects, pk=review_id)
         serializer.save(author=self.request.user, title=title,
                         review=review)
-      
