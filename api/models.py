@@ -25,13 +25,8 @@ class Title(models.Model):
     year = models.IntegerField('Год выпуска', )
     description = models.TextField()
     genre = models.ManyToManyField('Genre', related_name="genres")
-    # rating = models.IntegerField('Рейтинг', )
     category = models.ForeignKey('Category', on_delete=models.CASCADE,
                                  related_name="categories")
-
-
-# class Rating(models.Model):
-#     pass
 
 
 class Review(models.Model):
