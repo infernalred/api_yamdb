@@ -18,8 +18,8 @@ router_v1.register(r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comment
                    CommentViewSet, basename='Comment')
 
 urlpatterns = [
-    path('v1/', include(router_v1.urls)),
     path('v1/users/me/', UserProfileChangeViewSet.as_view()),
+    path('v1/', include(router_v1.urls)),
     path('v1/auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('v1/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
