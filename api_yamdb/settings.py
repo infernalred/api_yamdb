@@ -139,11 +139,12 @@ REST_FRAMEWORK = {
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_URLS_REGEX = r'^/api/.*$'
 
-'''PASSWORDLESS_AUTH = {
+PASSWORDLESS_AUTH = {
     'PASSWORDLESS_AUTH_TYPES': ['EMAIL'],
     'PASSWORDLESS_EMAIL_NOREPLY_ADDRESS': 'noreply@example.com',
-    'PASSWORDLESS_AUTH_TOKEN_CREATOR': 'api.custom_jwt_token_creation.get_tokens_for_user',
-}'''
+    'PASSWORDLESS_AUTH_TOKEN_CREATOR': 'api.jwt_token_generation.get_tokens_for_user',
+    'PASSWORDLESS_AUTH_TOKEN_SERIALIZER': 'api.jwt_token_serializer.JWTTokenResponseSerializer',
+}
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 

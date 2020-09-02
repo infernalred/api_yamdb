@@ -1,12 +1,12 @@
-from rest_framework import viewsets, filters, status, permissions
+from rest_framework import viewsets, filters, status, permissions, exceptions
 from rest_framework.generics import get_object_or_404, RetrieveUpdateAPIView
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
+from api.filters import TitleFilter
 from api.models import Review, Title, Genre, Category, Comment, CustomUser
-from api.permissions import IsAdminOrReadOnly, IsAuthorOrModerator, IsAdminUser, AdminOrReadOnly
+from api.permissions import IsAdminOrReadOnly, IsAuthorOrModerator
 from api.serializers import CommentSerializer, ReviewSerializer, \
     TitleSerializer, GenreSerializer, CategorySerializer, \
     UserForAdminSerializer, UserSerializer
@@ -35,49 +35,18 @@ class UserProfileChangeViewSet(RetrieveUpdateAPIView):
 
 
 class TitleView(viewsets.ModelViewSet):
-    permission_classes = (AdminOrReadOnly, IsAdminUser)
+    permission_classes = (IsAdminOrReadOnly, )
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('name', 'year', 'genre', 'category',)
+    filterset_class = TitleFilter
 
-    # def perform_create(self, serializer):
-    #     name = self.request.data.get('name')
-    #     year = self.request.data.get('year') or None
-    #     description = self.request.data.get('description') or None
-    #     category_slug = self.request.data.get('category') or None
-    #     genre_slug = self.request.data.get("genre") or None
-    #     if genre_slug is not None:
-    #         if len(genre_slug)>1:
-    #             return Response(status=status.HTTP_404_NOT_FOUND)
-    #         genre = get_object_or_404(Genre, slug=genre_slug[0])
-    #         genres = []
-    #         genres.append(genre)
-    #     else:
-    #         genres = []
-    #     if category_slug is not None:
-    #         category = get_object_or_404(Category, slug=category_slug)
-    #     else:
-    #         category = None
-    #     if serializer.is_valid:
-    #             serializer.save(name=name, category=category, genre=genres, year=year, description=description)
-
-    def perform_update(self, serializer):
-        category_slug = self.request.data.get('category')
-        category = get_object_or_404(Category, slug=category_slug)
-        genre_slugs = self.request.data.get('genre')
-        genres = []
-        for genre_slug in genre_slugs:
-            genre = get_object_or_404(Genre, slug=genre_slug)
-            genres.append(genre)
-        if serializer.is_valid():
-            serializer.save(category=category, genre=genres)
-            return Response(serializer.data)
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    def perform_create(self, serializer):
+        serializer.save()
 
 
 class GenreView(viewsets.ModelViewSet):
-    permission_classes = (AdminOrReadOnly, IsAdminUser)
+    permission_classes = (IsAdminOrReadOnly, )
     queryset = Genre.objects.all()
     lookup_field = 'slug'
     serializer_class = GenreSerializer
@@ -92,7 +61,7 @@ class GenreView(viewsets.ModelViewSet):
 
 
 class CategoryView(viewsets.ModelViewSet):
-    permission_classes = (AdminOrReadOnly, IsAdminUser)
+    permission_classes = (IsAdminOrReadOnly, )
     queryset = Category.objects.all()
     lookup_field = 'slug'
     serializer_class = CategorySerializer
@@ -108,7 +77,7 @@ class CategoryView(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = [IsAdminOrReadOnly|IsAuthorOrModerator&IsAuthenticatedOrReadOnly]
+    permission_classes = (IsAdminOrReadOnly|IsAuthorOrModerator, )
 
     def get_queryset(self):
         title_id = self.kwargs.get("title_id")
@@ -116,24 +85,20 @@ class ReviewViewSet(viewsets.ModelViewSet):
         queryset = title.reviews.all()
         return queryset
 
-    def create(self, request, *args, **kwargs):
+    def perform_create(self, serializer):
         title_id = self.kwargs.get("title_id")
-        user = request.user
-        title = get_object_or_404(Title.objects, pk=title_id)
-        if Review.objects.filter(title=title, author=user).exists():
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        title = get_object_or_404(Title, pk=title_id)
+        user = self.request.user
 
-        serializer = ReviewSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(author=user, title=title)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if Review.objects.filter(author=user, title=title).exists():
+            raise exceptions.ValidationError
 
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        serializer.save(author=user, title=title)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = [IsAdminOrReadOnly|IsAuthorOrModerator&IsAuthenticatedOrReadOnly]
+    permission_classes = (IsAdminOrReadOnly|IsAuthorOrModerator,)
 
     def get_queryset(self):
         title_id = self.kwargs.get("title_id")

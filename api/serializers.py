@@ -5,6 +5,11 @@ from .models import Comment, Review, Title, \
     Category, Genre, CustomUser
 
 
+class JWTTokenResponseSerializer(serializers.Serializer):
+    access = serializers.CharField()
+    refresh = serializers.CharField()
+
+
 class UserForAdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
@@ -26,15 +31,36 @@ class GenreSerializer(serializers.ModelSerializer):
         model = Genre
 
 
+class GenreField(serializers.SlugRelatedField):
+    def to_representation(self, value):
+        serializer = GenreSerializer(value)
+        return serializer.data
+
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         fields = ("name", "slug")
         model = Category
 
 
+class CategoryField(serializers.SlugRelatedField):
+    def to_representation(self, value):
+        serializer = CategorySerializer(value)
+        return serializer.data
+
+
 class TitleSerializer(serializers.ModelSerializer):
-    genre = GenreSerializer(read_only=True, many=True)
-    category = CategorySerializer(read_only=True)
+    genre = GenreField(
+        slug_field="slug",
+        required=False,
+        many=True,
+        queryset=Genre.objects.all()
+    )
+    category = CategoryField(
+        slug_field="slug",
+        required=False,
+        queryset=Category.objects.all()
+    )
     rating = serializers.SerializerMethodField()
 
     class Meta:

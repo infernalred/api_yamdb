@@ -12,6 +12,9 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ('username',)
 
+    class Meta:
+        ordering = ('username', )
+
 
 class Genre(models.Model):
     name = models.TextField(unique=True)
@@ -21,7 +24,7 @@ class Genre(models.Model):
         return f"{self.name, self.slug}"
 
     class Meta:
-        ordering = ('-name', )
+        ordering = ('-pk', )
 
 
 class Category(models.Model):
@@ -32,7 +35,7 @@ class Category(models.Model):
         return f"{self.name, self.slug}"
 
     class Meta:
-        ordering = ('-name', )
+        ordering = ('-pk', )
 
 
 class Title(models.Model):
@@ -44,7 +47,7 @@ class Title(models.Model):
                                  related_name="categories", blank=True, null=True)
 
     class Meta:
-        ordering = ('-name', )
+        ordering = ('-pk', )
 
 
 class Review(models.Model):
