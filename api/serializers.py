@@ -5,11 +5,6 @@ from .models import Comment, Review, Title, \
     Category, Genre, CustomUser
 
 
-class JWTTokenResponseSerializer(serializers.Serializer):
-    access = serializers.CharField()
-    refresh = serializers.CharField()
-
-
 class UserForAdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser

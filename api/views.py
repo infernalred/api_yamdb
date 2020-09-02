@@ -6,7 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from api.filters import TitleFilter
 from api.models import Review, Title, Genre, Category, Comment, CustomUser
-from api.permissions import IsAdminOrReadOnly, IsAuthorOrModerator
+from api.permissions import IsAdminOrReadOnly, IsAuthorOrModerator, IsAdminOnly
 from api.serializers import CommentSerializer, ReviewSerializer, \
     TitleSerializer, GenreSerializer, CategorySerializer, \
     UserForAdminSerializer, UserSerializer
@@ -15,17 +15,17 @@ from api.serializers import CommentSerializer, ReviewSerializer, \
 class UsersToolsForAdminViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserForAdminSerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = (IsAdminOnly, )
     lookup_field = 'username'
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['=username']
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('=username', )
     pagination_class = PageNumberPagination
 
 
 class UserProfileChangeViewSet(RetrieveUpdateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = (permissions.IsAuthenticated, )
 
     def get_object(self):
         print(self.request.user.email)
