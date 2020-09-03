@@ -10,7 +10,11 @@ class Token():
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
     token = Token(
+<<<<<<< HEAD
         access=str(refresh.access_token), 
+=======
+        access=str(refresh.access_token),
+>>>>>>> master
         refresh=str(refresh)
     )
     data = (token, True)

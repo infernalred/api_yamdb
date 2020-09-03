@@ -1,24 +1,57 @@
+<<<<<<< HEAD
 from rest_framework import viewsets, filters, status, mixins, permissions
+=======
+from rest_framework import viewsets, filters, status, permissions, exceptions
+>>>>>>> master
 from rest_framework.generics import get_object_or_404, RetrieveUpdateAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
+<<<<<<< HEAD
 from api.models import Review, Title, Genre, Category, Comment, CustomUser 
 from api.serializers import CommentSerializer, ReviewSerializer, \
     TitleSerializer, GenreSerializer, CategorySerializer, \
     UserForAdminSerializer, UserSerializer
 from api.custom_permissions import IsAuthorOrModerator, IsAdminOrReadOnly, IsAdminOnly
+=======
+from api.filters import TitleFilter
+from api.models import Review, Title, Genre, Category, Comment, CustomUser
+from api.permissions import IsAdminOrReadOnly, IsAuthorOrModerator, IsAdminOnly
+from api.serializers import CommentSerializer, ReviewSerializer, \
+    TitleSerializer, GenreSerializer, CategorySerializer, \
+    UserForAdminSerializer, UserSerializer
+>>>>>>> master
 
 
 class UsersToolsForAdminViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserForAdminSerializer
+<<<<<<< HEAD
     permission_classes = (IsAdminOnly,)
     lookup_field = 'username'
     filter_backends = [filters.SearchFilter]
     search_fields = ['=username']
     pagination_class = PageNumberPagination
+=======
+    permission_classes = (IsAdminOnly, )
+    lookup_field = 'username'
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('=username', )
+    pagination_class = PageNumberPagination
+
+
+class UserProfileChangeViewSet(RetrieveUpdateAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def get_object(self):
+        print(self.request.user.email)
+        obj = get_object_or_404(CustomUser, email=self.request.user.email)
+        print(obj.email)
+        return obj
+>>>>>>> master
 
 
 class UserProfileChangeViewSet(RetrieveUpdateAPIView):
@@ -31,20 +64,26 @@ class UserProfileChangeViewSet(RetrieveUpdateAPIView):
         return obj
 
 class TitleView(viewsets.ModelViewSet):
+<<<<<<< HEAD
     permission_classes = (IsAdminOrReadOnly,)
+=======
+    permission_classes = (IsAdminOrReadOnly, )
+>>>>>>> master
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('name', 'year', 'genre', 'category',)
+    filterset_class = TitleFilter
 
     def perform_create(self, serializer):
-        slug_name = self.request.data.get("category")
-        category = get_object_or_404(Category.objects, slug=slug_name)
-        serializer.save(category=category)
+        serializer.save()
 
 
 class GenreView(viewsets.ModelViewSet):
+<<<<<<< HEAD
     permission_classes = (IsAdminOrReadOnly,)
+=======
+    permission_classes = (IsAdminOrReadOnly, )
+>>>>>>> master
     queryset = Genre.objects.all()
     lookup_field = 'slug'
     serializer_class = GenreSerializer
@@ -52,14 +91,18 @@ class GenreView(viewsets.ModelViewSet):
     search_fields = ('name',)
 
     def retrieve(self, request, *args, **kwargs):
-       return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def partial_update(self, request, *args, **kwargs):
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)  
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class CategoryView(viewsets.ModelViewSet):
+<<<<<<< HEAD
     permission_classes = (IsAdminOrReadOnly,)
+=======
+    permission_classes = (IsAdminOrReadOnly, )
+>>>>>>> master
     queryset = Category.objects.all()
     lookup_field = 'slug'
     serializer_class = CategorySerializer
@@ -67,7 +110,7 @@ class CategoryView(viewsets.ModelViewSet):
     search_fields = ('name',)
 
     def retrieve(self, request, *args, **kwargs):
-       return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def partial_update(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -75,7 +118,11 @@ class CategoryView(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
+<<<<<<< HEAD
     permission_classes = (IsAdminOrReadOnly|IsAuthorOrModerator,)
+=======
+    permission_classes = (IsAdminOrReadOnly|IsAuthorOrModerator, )
+>>>>>>> master
 
     def get_queryset(self):
         title_id = self.kwargs.get("title_id")
@@ -84,10 +131,14 @@ class ReviewViewSet(viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
-        """Create a new comment."""
         title_id = self.kwargs.get("title_id")
-        title = get_object_or_404(Title.objects, pk=title_id)
-        serializer.save(author=self.request.user, title=title)
+        title = get_object_or_404(Title, pk=title_id)
+        user = self.request.user
+
+        if Review.objects.filter(author=user, title=title).exists():
+            raise exceptions.ValidationError
+
+        serializer.save(author=user, title=title)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
