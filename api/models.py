@@ -1,8 +1,8 @@
-from django.contrib.auth import get_user_model, AbstractUser
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-User = get_user_model()
-
+#User = get_user_model()
 
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
@@ -12,6 +12,9 @@ class CustomUser(AbstractUser):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ('username',)
+
+
+User = get_user_model()
 
 
 class Genre(models.Model):

@@ -1,22 +1,20 @@
-from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, filters, status, mixins, permissions
 from rest_framework.generics import get_object_or_404, RetrieveUpdateAPIView
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
 from api.models import Review, Title, Genre, Category, Comment, CustomUser 
-from api.permissions import AdminOrReadOnly, IsAdminUser
 from api.serializers import CommentSerializer, ReviewSerializer, \
     TitleSerializer, GenreSerializer, CategorySerializer, \
     UserForAdminSerializer, UserSerializer
+from api.custom_permissions import IsAuthorOrModerator, IsAdminOrReadOnly, IsAdminOnly
 
 
 class UsersToolsForAdminViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserForAdminSerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = (IsAdminOnly,)
     lookup_field = 'username'
     filter_backends = [filters.SearchFilter]
     search_fields = ['=username']
@@ -29,13 +27,11 @@ class UserProfileChangeViewSet(RetrieveUpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
-        print(self.request.user.email)
         obj = get_object_or_404(CustomUser, email=self.request.user.email)
-        print(obj.email)
         return obj
 
 class TitleView(viewsets.ModelViewSet):
-    permission_classes = (AdminOrReadOnly, IsAdminUser)
+    permission_classes = (IsAdminOrReadOnly,)
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
@@ -48,7 +44,7 @@ class TitleView(viewsets.ModelViewSet):
 
 
 class GenreView(viewsets.ModelViewSet):
-    permission_classes = (AdminOrReadOnly, IsAdminUser)
+    permission_classes = (IsAdminOrReadOnly,)
     queryset = Genre.objects.all()
     lookup_field = 'slug'
     serializer_class = GenreSerializer
@@ -63,7 +59,7 @@ class GenreView(viewsets.ModelViewSet):
 
 
 class CategoryView(viewsets.ModelViewSet):
-    permission_classes = (AdminOrReadOnly, IsAdminUser)
+    permission_classes = (IsAdminOrReadOnly,)
     queryset = Category.objects.all()
     lookup_field = 'slug'
     serializer_class = CategorySerializer
@@ -79,7 +75,7 @@ class CategoryView(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = (AdminOrReadOnly, IsAdminUser)
+    permission_classes = (IsAdminOrReadOnly|IsAuthorOrModerator,)
 
     def get_queryset(self):
         title_id = self.kwargs.get("title_id")
@@ -96,7 +92,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAdminOrReadOnly|IsAuthorOrModerator,)
 
     def get_queryset(self):
         title_id = self.kwargs.get("title_id")
