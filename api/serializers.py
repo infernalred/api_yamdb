@@ -1,36 +1,23 @@
 from django.db.models import Avg
 from rest_framework import serializers
 
-<<<<<<< HEAD
-from .models import Comment, Review, Title, Category, Genre, CustomUser
-=======
 from .models import Comment, Review, Title, \
-    Category, Genre, CustomUser
->>>>>>> master
+    Category, Genre, User
 
 
 class UserForAdminSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CustomUser
-<<<<<<< HEAD
-        fields = ('first_name', 'last_name', 'username', 'bio', 'email', 'role')
-=======
+        model = User
         fields = ("first_name", "last_name", "username",
                   "bio", "email", "role")
->>>>>>> master
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CustomUser
-<<<<<<< HEAD
-        fields = ('first_name', 'last_name', 'username', 'bio', 'email', 'role')
-        read_only_fields = ('role', 'email')
-=======
+        model = User
         fields = ("first_name", "last_name", "username",
                   "bio", "email", "role")
         read_only_fields = ("role", "email")
->>>>>>> master
 
 
 class GenreSerializer(serializers.ModelSerializer):

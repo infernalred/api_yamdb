@@ -3,7 +3,6 @@ from rest_framework import permissions
 MODERATOR_METHODS = ('PATCH', 'DELETE')
 
 
-# for UsersToolsForAdminViewSet
 class IsAdminOnly(permissions.BasePermission):
     
     def has_permission(self, request, view):
@@ -13,7 +12,6 @@ class IsAdminOnly(permissions.BasePermission):
         return request.user.is_staff or request.user.is_authenticated and request.user.role == 'admin'
 
 
-# for GENRES, TITLES and CATEGORIES set permission_classes = (IsAdminOrReadOnly,)
 class IsAdminOrReadOnly(permissions.BasePermission):
     
     def has_permission(self, request, view):
@@ -27,7 +25,6 @@ class IsAdminOrReadOnly(permissions.BasePermission):
         return request.user.is_staff or request.user.is_authenticated and request.user.role == 'admin'
 
 
-# for COMMENTS and REVIEWS set permissions_classes = (IsAdminOrReadOnly|IsAuthorOrModerator,)
 class IsAuthorOrModerator(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:

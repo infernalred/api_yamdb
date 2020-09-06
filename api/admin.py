@@ -1,12 +1,8 @@
 from django.contrib import admin
 
-from .models import Review, Comment, Title, Category, Genre, CustomUser
+from .models import Review, Comment, Title, Category, Genre, User
 
-<<<<<<< HEAD
-
-=======
->>>>>>> master
-admin.site.register(CustomUser)
+admin.site.register(User)
 
 
 @admin.register(Title)

@@ -29,29 +29,17 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-<<<<<<< HEAD
-    'api',
-    'drfpasswordless',
-    'django_filters',
-    'rest_framework',
-    'rest_framework.authtoken',
-    'corsheaders',
-=======
->>>>>>> master
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-<<<<<<< HEAD
-=======
     'rest_framework',
     'drfpasswordless',
     'corsheaders',
     'django_filters',
     'api',
->>>>>>> master
 ]
 
 MIDDLEWARE = [
@@ -133,24 +121,8 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
 
-AUTH_USER_MODEL = 'api.CustomUser'
+AUTH_USER_MODEL = 'api.User'
 
-<<<<<<< HEAD
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_URLS_REGEX = r'^/api/.*$'
-
-PASSWORDLESS_AUTH = {
-    'PASSWORDLESS_AUTH_TYPES': ['EMAIL'],
-    'PASSWORDLESS_EMAIL_NOREPLY_ADDRESS': 'noreply@example.com',
-    'PASSWORDLESS_AUTH_TOKEN_CREATOR': 'api.jwt_token_generation.get_tokens_for_user',
-    'PASSWORDLESS_AUTH_TOKEN_SERIALIZER': 'api.jwt_token_serializer.JWTTokenResponseSerializer',
-}
-
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-
-=======
->>>>>>> master
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
@@ -164,8 +136,6 @@ REST_FRAMEWORK = {
 
 }
 
-<<<<<<< HEAD
-=======
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_URLS_REGEX = r'^/api/.*$'
 
@@ -178,7 +148,6 @@ PASSWORDLESS_AUTH = {
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
->>>>>>> master
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
