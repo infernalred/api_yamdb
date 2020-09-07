@@ -1,20 +1,22 @@
 from django.db.models import Avg
-from rest_framework import serializers
+from rest_framework import serializers, exceptions
 
-from .models import Comment, Review, Title, \
-    Category, Genre, CustomUser
+from .models import (
+    Comment, Review, Title,
+    Category, Genre, User
+)
 
 
 class UserForAdminSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CustomUser
+        model = User
         fields = ("first_name", "last_name", "username",
                   "bio", "email", "role")
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CustomUser
+        model = User
         fields = ("first_name", "last_name", "username",
                   "bio", "email", "role")
         read_only_fields = ("role", "email")
@@ -25,11 +27,11 @@ class GenreSerializer(serializers.ModelSerializer):
         fields = ("name", "slug")
         model = Genre
 
-
-class GenreField(serializers.SlugRelatedField):
-    def to_representation(self, value):
-        serializer = GenreSerializer(value)
-        return serializer.data
+    def to_representation(self, obj):
+        return {
+            "name": obj.name,
+            "slug": obj.slug
+        }
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -37,25 +39,16 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ("name", "slug")
         model = Category
 
+    def to_representation(self, obj):
+        return {
+            "name": obj.name,
+            "slug": obj.slug
+        }
 
-class CategoryField(serializers.SlugRelatedField):
-    def to_representation(self, value):
-        serializer = CategorySerializer(value)
-        return serializer.data
 
-
-class TitleSerializer(serializers.ModelSerializer):
-    genre = GenreField(
-        slug_field="slug",
-        required=False,
-        many=True,
-        queryset=Genre.objects.all()
-    )
-    category = CategoryField(
-        slug_field="slug",
-        required=False,
-        queryset=Category.objects.all()
-    )
+class TitleReadSerializer(serializers.ModelSerializer):
+    genre = GenreSerializer(many=True, read_only=True)
+    category = CategorySerializer(read_only=True)
     rating = serializers.SerializerMethodField()
 
     class Meta:
@@ -69,6 +62,25 @@ class TitleSerializer(serializers.ModelSerializer):
         return rating
 
 
+class TitleWriteSerializer(serializers.ModelSerializer):
+    genre = serializers.SlugRelatedField(
+        slug_field="slug",
+        many=True,
+        required=False,
+        queryset=Genre.objects.all()
+    )
+    category = serializers.SlugRelatedField(
+        slug_field="slug",
+        required=False,
+        queryset=Category.objects.all()
+    )
+
+    class Meta:
+        fields = ("id", "name", "year", "genre",
+                  "category", "description")
+        model = Title
+
+
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(read_only=True, slug_field='username')
 
@@ -76,6 +88,14 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ("id", "text", "author", "score", "pub_date",)
         read_only_fields = ("id", "author", "pub_date")
         model = Review
+
+    def validate(self, attrs):
+        title_id = self.context['view'].kwargs.get("title_id")
+        user = self.context['request'].user
+        if self.context['view'].action == "create" and \
+                Review.objects.filter(author=user, title_id=title_id).exists():
+            raise exceptions.ValidationError
+        return attrs
 
 
 class CommentSerializer(serializers.ModelSerializer):
