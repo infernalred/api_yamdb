@@ -1,4 +1,3 @@
-from django.db.models import Avg
 from rest_framework import serializers, exceptions
 
 from .models import (
@@ -49,17 +48,13 @@ class CategorySerializer(serializers.ModelSerializer):
 class TitleReadSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(many=True, read_only=True)
     category = CategorySerializer(read_only=True)
-    rating = serializers.SerializerMethodField()
+    rating = serializers.FloatField()
 
     class Meta:
         fields = ("id", "name", "year", "genre", "rating",
                   "category", "description")
-        read_only_fields = ("id",)
+        read_only_fields = ("id", "rating")
         model = Title
-
-    def get_rating(self, obj):
-        rating = obj.reviews.all().aggregate(Avg("score")).get("score__avg")
-        return rating
 
 
 class TitleWriteSerializer(serializers.ModelSerializer):
@@ -89,13 +84,14 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "author", "pub_date")
         model = Review
 
-    def validate(self, attrs):
+    def validate(self, data):
+        if self.context['view'].action != "create":
+            return data
         title_id = self.context['view'].kwargs.get("title_id")
         user = self.context['request'].user
-        if self.context['view'].action == "create" and \
-                Review.objects.filter(author=user, title_id=title_id).exists():
-            raise exceptions.ValidationError
-        return attrs
+        if Review.objects.filter(author=user, title_id=title_id).exists():
+            raise exceptions.ValidationError("Отзыв уже был оставлен.")
+        return data
 
 
 class CommentSerializer(serializers.ModelSerializer):
