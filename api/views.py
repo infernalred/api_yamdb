@@ -1,3 +1,4 @@
+from django.db.models import Avg
 from rest_framework import viewsets, filters, permissions, mixins, status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
@@ -19,13 +20,20 @@ from api.serializers import (
 )
 
 
+class CreateDestroyListRetrieveViewSet(mixins.CreateModelMixin,
+                                       mixins.ListModelMixin,
+                                       mixins.DestroyModelMixin,
+                                       viewsets.GenericViewSet):
+    pass
+
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserForAdminSerializer
     permission_classes = (IsAdminOnly,)
     lookup_field = 'username'
-    filter_backends = (filters.SearchFilter, )
-    search_fields = ('=username', )
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('=username',)
     pagination_class = PageNumberPagination
 
     @action(
@@ -37,19 +45,17 @@ class UserViewSet(viewsets.ModelViewSet):
         if request.method == 'GET':
             serializer = UserSerializer(user_profile)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            serializer = UserSerializer(
-                user_profile, data=request.data, partial=True
-            )
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+        serializer = UserSerializer(
+            user_profile, data=request.data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class TitleView(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
-    queryset = Title.objects.all()
+    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
 
@@ -59,10 +65,7 @@ class TitleView(viewsets.ModelViewSet):
         return TitleWriteSerializer
 
 
-class GenreView(mixins.CreateModelMixin,
-                mixins.ListModelMixin,
-                mixins.DestroyModelMixin,
-                viewsets.GenericViewSet):
+class GenreView(CreateDestroyListRetrieveViewSet):
     permission_classes = (IsAdminOrReadOnly,)
     queryset = Genre.objects.all()
     lookup_field = 'slug'
@@ -71,10 +74,7 @@ class GenreView(mixins.CreateModelMixin,
     search_fields = ('name',)
 
 
-class CategoryView(mixins.CreateModelMixin,
-                   mixins.ListModelMixin,
-                   mixins.DestroyModelMixin,
-                   viewsets.GenericViewSet):
+class CategoryView(CreateDestroyListRetrieveViewSet):
     permission_classes = (IsAdminOrReadOnly,)
     queryset = Category.objects.all()
     lookup_field = 'slug'
